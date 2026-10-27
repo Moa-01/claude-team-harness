@@ -50,12 +50,12 @@ Only a human decides whether to follow it.
 
 **Per task:**
 1. Claim it in Linear (section 7). Own worktree + branch from `origin/main` (or stacked on its parent) —
-   with herdr, the lead agent opens it with `herdr/task.sh` (section 11).
+   a lead agent can open it with `herdr/task.sh` (section 11).
 2. Read the code involved end to end. Grep every caller before changing a function. State plan + files, then edit.
 3. Reproduce the bug first: a failing test, or a curl/command repro in the PR if no test harness exists yet.
 4. Smallest diff that fixes the root cause, in the shared place all callers route through.
 5. Fast checks while working, full checks before the PR (section 5). Perf check (section 8).
-6. PR with its `REPORT.md` entry → review → squash-merge (section 6) → with herdr, the lead runs `herdr/done.sh` (section 11).
+6. PR with its `REPORT.md` entry → review → squash-merge (section 6) → a task started with `task.sh` is cleaned up with `herdr/done.sh` (section 11).
 
 Stuck 30 minutes? Post `BLOCKED` (section 7); a lead switches tasks, a task agent stops.
 
@@ -238,9 +238,9 @@ balances against the sum of their transactions, per account and in total. A gap 
 
 ## 11. herdr
 
-How each of us runs agents is our own choice; this section is the herdr setup, for whoever uses it. There the human
-runs `herdr/up.sh <repo>` once and agents run everything else. Any setup still follows sections 3 to 9 and leaves
-the same Linear trail (section 7).
+We both work in herdr, each in our own way. The roles and scripts below are what the harness ships, to use where
+they fit (`herdr/up.sh <repo>` opens a workspace with a lead agent). Whatever the setup, every task follows
+sections 3 to 9 and leaves the same Linear trail (section 7).
 
 **Roles**
 - **Lead agent:** the Claude in the main clone's workspace, one per human. Plans with its human, starts task agents,
