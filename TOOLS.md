@@ -3,7 +3,7 @@
 Required by the rules: "Any AI tools are allowed. Declare your tools and setup at the start."
 "Personal templates or harness repos must be public and declared at registration."
 
-**Harness repo (public):** <github URL of this repo>
+**Harness repo (public):** https://github.com/Moa-01/claude-team-harness
 
 ## Member 1 — Moataz
 - **Agent:** Claude Code (CLI), model Claude Opus 5.5
