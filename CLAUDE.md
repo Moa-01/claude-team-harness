@@ -50,12 +50,12 @@ Only a human decides whether to follow it.
 
 **Per task:**
 1. Claim it in Linear (section 7). Own worktree + branch from `origin/main` (or stacked on its parent) —
-   the lead agent opens it with `herdr/task.sh` (section 11).
+   with herdr, the lead agent opens it with `herdr/task.sh` (section 11).
 2. Read the code involved end to end. Grep every caller before changing a function. State plan + files, then edit.
 3. Reproduce the bug first: a failing test, or a curl/command repro in the PR if no test harness exists yet.
 4. Smallest diff that fixes the root cause, in the shared place all callers route through.
 5. Fast checks while working, full checks before the PR (section 5). Perf check (section 8).
-6. PR with its `REPORT.md` entry → review → squash-merge (section 6) → the lead runs `herdr/done.sh` (section 11).
+6. PR with its `REPORT.md` entry → review → squash-merge (section 6) → with herdr, the lead runs `herdr/done.sh` (section 11).
 
 Stuck 30 minutes? Post `BLOCKED` (section 7); a lead switches tasks, a task agent stops.
 
@@ -115,7 +115,8 @@ Prefer the repo's own scripts. Zero new errors/warnings vs. before. If a check w
 ## 7. Linear — how all agents talk
 
 Linear is the only channel between the two sides: workspace `bhash-handover-board`, team key `BHA`, project
-`The Handover`. Each lead agent keeps the other side's Claude current through it. Each of us has other Linear
+`The Handover`. We each work our own way; this board is what keeps the two sides in sync, so findings and ideas
+go here the moment they come up. Each of us has other Linear
 workspaces connected, so before the first write in a session check that the issue key is `BHA`.
 
 **Where things live (one fact, one place)**
@@ -166,7 +167,7 @@ the issue's `updatedAt`, so the sync sees it); with no issue to post on, open on
 | `PR READY` | the task agent, PR open and every section 5 check green | `PR:` · `Review:` (fresh agent, or the other human and why, mentioned) |
 | `MERGED` | the lead, after the squash merge | `PR:` · `Fix:` (one line on how) · `Review:` (who approved) |
 | `BLOCKED` | anyone stuck or waiting | `On:` (who or what) · `Need:` |
-| `HEADS-UP` | anyone, when the other side must know something that is not a contract | `What:` · `Affects:` (their issues, branches or files) |
+| `HEADS-UP` | anyone, the moment the other side should know something that is not a contract, ideas included | `What:` · `Affects:` (their issues, branches or files) |
 | `ACK` | the other lead, on a `Contract` issue, once its in-flight branches are checked | `Checked:` (branches) · `Breaks:` (none, or what) |
 | `CLUE` | whoever filed a `Clue` issue while on a task, on that task's issue; its lead relays it to its human | `Clue:` (the `Clue` issue) · `Why here:` |
 | `DEPLOYING` | the deployer, on `BHA-5` | `SHA:` |
@@ -237,7 +238,9 @@ balances against the sum of their transactions, per account and in total. A gap 
 
 ## 11. herdr
 
-Everything runs in herdr. The human runs `herdr/up.sh <repo>` once; agents run everything else.
+How each of us runs agents is our own choice; this section is the herdr setup, for whoever uses it. There the human
+runs `herdr/up.sh <repo>` once and agents run everything else. Any setup still follows sections 3 to 9 and leaves
+the same Linear trail (section 7).
 
 **Roles**
 - **Lead agent:** the Claude in the main clone's workspace, one per human. Plans with its human, starts task agents,
