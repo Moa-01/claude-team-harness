@@ -1,4 +1,8 @@
 {
+  "attribution": {
+    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
+    "pr": "Co-Authored-By: Claude <noreply@anthropic.com>"
+  },
   "permissions": {
     "allow": [
       "Bash(git status:*)",
@@ -43,6 +47,14 @@
       "Bash(docker volume rm:*)",
       "Bash(docker volume prune:*)",
       "Bash(docker system prune:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/team-guard.sh\"" }]
+      }
     ]
   }
 }

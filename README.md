@@ -12,6 +12,8 @@ Rules and setup for a two-person team using Claude Code on an inherited full-sta
 | `.claude/docs/team-git-workflow.md` | Repo layout, worktrees, stacked PRs, final PR — read when needed |
 | `.claude/docs/team-performance.md` | Performance checklist, handling load, load testing — read when needed |
 | `.claude/settings.json` | Allows read-only/test commands; blocks force-push, pushing to `main`, `git clean`, reading `.env`, unneeded connectors; asks before deleting files or Docker volumes |
+| `.claude/hooks/team-guard.*` | Blocks what a permission prefix can't: force pushes with the flag at the end, any push to `main`, `gh pr create` without `--repo` |
+| `AGENTS.override.md` (generated) | `install.sh` writes our rules for Codex too, so `AGENT_KIND=codex herdr/task.sh ...` starts a Codex task agent |
 | `install.sh` | Copies the harness into a project without it ever showing up in git |
 | `herdr/up.sh` | Opens a herdr workspace for the project (default tabs `claude app tests git`, or your own) |
 | `herdr/task.sh` | Used by the lead agent: one task = its own worktree + herdr workspace + Claude |

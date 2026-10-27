@@ -3,7 +3,8 @@
 # Usage: herdr/task.sh <repo-dir> <branch> [base]
 #   <branch>: use Linear's "Copy git branch name". Existing branch is checked out; new one starts from [base].
 #   [base]:   default origin/main. For a stacked PR pass the parent branch.
-# Env: START_CLAUDE=0 to only open the workspace; HERDR_SESSION=<n> for a named session.
+# Env: START_CLAUDE=0 to only open the workspace; HERDR_SESSION=<n> for a named session;
+#      AGENT_KIND=codex for a Codex task agent (default claude), which reads the rules from AGENTS.override.md.
 set -euo pipefail
 
 harness="$(cd "$(dirname "$0")/.." && pwd)"
@@ -30,6 +31,6 @@ fi
 
 ws_json="$(h workspace create --cwd "$path" --label "$slug" --no-focus)"
 if [ "${START_CLAUDE:-1}" = 1 ]; then
-  h agent start "t-$slug" --kind claude --pane "$(get result.root_pane.pane_id <<<"$ws_json")" >/dev/null
+  h agent start "t-$slug" --kind "${AGENT_KIND:-claude}" --pane "$(get result.root_pane.pane_id <<<"$ws_json")" >/dev/null
 fi
 echo "task workspace $(get result.workspace.workspace_id <<<"$ws_json") ready — agent t-$slug — $path ($branch from $base)"

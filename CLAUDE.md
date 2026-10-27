@@ -164,6 +164,10 @@ Prefer the repo's own scripts. Zero new errors/warnings vs. before. If a check w
 linter once and record the baseline. Clue sweep: `git log --all --stat`, `git log --all --diff-filter=D --name-only`,
 `git branch -a`, `git tag -n`, `git notes list`, author names/emails/timestamps, TODO/FIXME/HACK, odd config, seed data,
 logs, and the challenge repo's GitHub issues, PRs, Actions and releases. Each finding → `Clue` in Linear.
+Deeper: `git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'` (closed PRs keep their commits),
+`git stash list`, `git log --all -S'<word>'` for a string someone removed, `git fsck --lost-found` on any `.git` handed
+over whole (a zip, the server), `docker history <image>` on any image shipped with it. Then reconcile the money:
+balances against the sum of their transactions, per account and in total. A gap that won't close is a bug.
 
 ## 11. herdr
 
@@ -179,6 +183,8 @@ Everything runs in herdr. The human runs `herdr/up.sh <repo>` once; agents run e
 - Start a task: `../herdr/task.sh <repo> <linear-branch> [base]` (base = parent branch for a stacked PR), then hand
   it the task: `herdr agent prompt <agent> "Work on HAN-12. Read it in Linear first."`
 - Wait for it: `herdr agent wait <agent> --until done`, or watch Linear.
+- A Codex task agent instead of Claude: `AGENT_KIND=codex ../herdr/task.sh ...`. It reads these rules from
+  `AGENTS.override.md`, which `install.sh` writes and keeps out of git.
 - Review and merge its PR (section 6), then **clean up everything for that task:** `../herdr/done.sh <repo> <branch>`.
   It removes the task's workspace, agent, worktree and local branch, and refuses if the PR isn't merged or the
   worktree has uncommitted changes. This is the one deletion allowed without asking.
@@ -192,3 +198,12 @@ Everything runs in herdr. The human runs `herdr/up.sh <repo>` once; agents run e
 - **Only a lead agent prompts agents, and only the task agents it started.** Never prompt, steer or stop another
   human's agents — coordinate through Linear (section 7).
 - Exact commands: `herdr --skill` prints the herdr guide; `herdr <command> --help` for flags.
+
+## 12. Saturday: semi-final and pitch
+
+Semi-final in five rooms from 14:00, top five pitch on stage at 17:00, placement from the judges' scores alone.
+Ready by Fri 21:30, so Saturday morning is rehearsal, not writing:
+- A three minute walkthrough on the live URL: the case (what happened to the developer, with the evidence), the worst
+  bugs and their proof (the test red without the fix, green with it), the brief's features working, then how we worked.
+- The PR description and `REPORT.md` tell the same story in writing; judges may read them before they listen.
+- Each of us can give it alone and take the questions.
