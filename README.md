@@ -43,8 +43,8 @@ Rules and setup for a two-person team using Claude Code on an inherited full-sta
    ```
    then `/mcp` inside Claude Code to log in. Already have another Linear workspace connected? Add this one under its
    own name (`linear-bhash`) so neither login replaces the other.
-   In Linear: a project `The Handover`, a document `Facts`, an issue `Deploy`, labels `Bug`, `Feature`, `Clue`,
-   `Contract` (CLAUDE.md section 7), and connect the repo in
+   The Linear items CLAUDE.md section 7 uses already exist in `bhash-handover-board`: project `The Handover`,
+   the `Facts` document, `BHA-5` (Deploy lock), labels `Bug`, `Feature`, `Clue`, `Contract`. Connect the repo in
    Linear → Settings → Integrations → GitHub.
 4. Team repo settings — squash only, squash commit uses the PR title and body, auto-delete merged branches:
    ```bash
