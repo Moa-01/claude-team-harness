@@ -12,11 +12,13 @@ Required by the rules: "Any AI tools are allowed. Declare your tools and setup a
 - **MCP servers:** Linear, claude-in-chrome
 - **Other:** <editor, extensions>
 
-## Member 2 — <name>
-- **Agent:** <fill in>
-- **Plugins/skills/hooks:** <fill in>
-- **MCP servers:** <fill in>
-- **Other:** <fill in>
+## Member 2 — Yusuf Mohamed
+- **Agent:** Claude Code (CLI), model Claude Opus 5.5; Codex CLI, model gpt-6.1-sol, for some task agents
+  (it reads the team rules from `AGENTS.override.md`)
+- **Plugins/skills/hooks:** superpowers, playwright (both from Claude Code's plugin directory); no personal hooks,
+  only this repo's `team-guard`
+- **MCP servers:** Linear, Playwright (through the plugin, headless)
+- **Other:** a Claude Code profile and a Codex home made only for this event, so no personal config loads
 
 ## Shared setup (this repo)
 - `CLAUDE.md`, `.claude/rules/`, `.claude/docs/` — rules and workflow for our agents
