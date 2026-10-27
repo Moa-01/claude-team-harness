@@ -54,3 +54,35 @@ PowerShell: `Get-Content loadtest.js | docker run --rm -i grafana/k6 run -`
 - Watch p95 latency, error rate, DB connections, memory. Profile the bottleneck, fix, re-run.
 - Local numbers don't show the hosted limits: run one short, gentle test against Dilmune too, after checking its limits.
 - Record before/after numbers in `REPORT.md`.
+
+Starter `loadtest.js`. The thresholds make k6 exit non-zero when they fail, so a run is a pass or a fail, not a
+number to eyeball. Swap `/health` for the real flows (login, list, transfer) once recon knows them, and pass the
+target with `-e BASE_URL=...` on the `docker run` line.
+```js
+import http from 'k6/http';
+import { check } from 'k6';
+
+export const options = {
+  vus: 20,
+  duration: '1m',
+  thresholds: { http_req_failed: ['rate<0.01'], http_req_duration: ['p(95)<500'] },
+};
+
+const BASE = __ENV.BASE_URL || 'http://host.docker.internal:8080';
+
+export default function () {
+  check(http.get(`${BASE}/health`), { 'status is 200': (r) => r.status === 200 });
+}
+```
+
+## Monitoring and Grafana
+
+- **The repo ships a monitoring stack** (Grafana, Prometheus, Loki, a `/metrics` route): bring it up with the app on
+  Thursday. Read every dashboard, alert rule, annotation and saved log query. They show what the last developer
+  watched and when things changed, so log what stands out as a `Clue`.
+- **It ships none:** no new infrastructure without human approval (rule above). If a metrics library is already a
+  dependency, exposing its standard endpoint is the cheap win; otherwise skip it.
+- **Load test with the dashboards open.** Capture p95 latency, error rate and DB connections before and after each
+  performance fix. Those pairs go in `REPORT.md` and the Saturday walkthrough (CLAUDE.md section 12).
+- **Health:** the deploy smoke test needs one route per service that also checks its database. Add it only where
+  none exists.
