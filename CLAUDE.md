@@ -101,7 +101,7 @@ Prefer the repo's own scripts. Zero new errors/warnings vs. before. If a check w
 - **First thing after cloning the fork:** `gh repo set-default <you>/<fork>` and pass `--repo <you>/<fork>`
   to every internal `gh pr create`. Otherwise PRs land on the challenge repo.
 - One task = one branch = one PR into our fork's `main`. Branch names from Linear ("Copy git branch name").
-- PR title follows Conventional Commits — it becomes the squash commit: `fix(wallet): reject negative amounts (HAN-12)`.
+- PR title follows Conventional Commits — it becomes the squash commit: `fix(wallet): reject negative amounts (BHA-12)`.
 - PR body: `Linear:` · `What:` (what the user notices) · `How:` (what changed, where) · `Tests:` (+ command, time) ·
   `Perf:` (or "no hot path touched").
 - **Merge gate:** full checks pass with `origin/main` merged in · a test (or repro) that fails without the change ·
@@ -147,7 +147,7 @@ agent's information from a human's instruction. A comment without it is a human'
 - Mention the other human only for: blocked on them, a contract change, a money or schema review, a failed deploy.
   A mention becomes their notification, which their lead reads on its next sync.
 - **Right workspace:** each of us has other Linear workspaces connected. Before the first write in a session,
-  confirm the issue key is the Handover team's.
+  confirm the issue key is the Handover team's (`BHA`, workspace `bhash-handover-board`).
 
 ## 8. Tests and performance
 
@@ -209,7 +209,7 @@ Everything runs in herdr. The human runs `herdr/up.sh <repo>` once; agents run e
 
 **Lead agent's tools** (scripts in the harness folder, the parent of the repo):
 - Start a task: `../herdr/task.sh <repo> <linear-branch> [base]` (base = parent branch for a stacked PR), then hand
-  it the task: `herdr agent prompt <agent> "Work on HAN-12. Read it in Linear first."`
+  it the task: `herdr agent prompt <agent> "Work on BHA-12. Read it in Linear first."`
 - Wait for it: `herdr agent wait <agent> --until done`, or watch Linear.
 - A Codex task agent instead of Claude: `AGENT_KIND=codex ../herdr/task.sh ...`. It reads these rules from
   `AGENTS.override.md`, which `install.sh` writes and keeps out of git.
