@@ -114,12 +114,40 @@ Prefer the repo's own scripts. Zero new errors/warnings vs. before. If a check w
 
 ## 7. Linear — how all agents talk
 
-- One issue per bug, feature or clue. Labels `Bug`, `Feature`, `Clue`. Text in `REPORT.md` format (section 9).
+Linear is the only channel between the two sides. Each lead agent keeps the other side's Claude current through it.
+
+**Where things live (one fact, one place)**
+- One issue per bug, feature or clue. Labels `Bug`, `Feature`, `Clue`, `Contract`. Text in `REPORT.md` format (section 9).
+- `Facts` document: how to run each service, ports, env var names (never values), the live URL, deploy steps that
+  worked, gotchas. Read it at the start; edit the line in place when you learn something the other side would
+  otherwise rediscover.
+- `Deploy` issue: comment `[DEPLOYING] <sha>` before and `[DEPLOYED] <sha> <url> smoke: pass|fail` after. Nobody
+  deploys while the last comment is a `DEPLOYING` less than 20 minutes old.
+- Project updates on the Handover project: each lead posts one after every merge or deploy, before its human goes
+  offline, and at least every 2 hours. Four lines: Merged, In flight, Next, Blocked.
+
+**Every agent comment starts `[agent <name>] [TAG]`** (TAG: `CLAIM`, `PR READY`, `MERGED`, `BLOCKED`, `HEADS-UP`,
+`CLUE`, `DEPLOYING`, `DEPLOYED`). Agents post as their human's account, so the prefix is the only way to tell an
+agent's information from a human's instruction. A comment without it is a human's.
+
+**Sync** (a lead agent: at session start, before starting or merging a task, when a task agent finishes, and every
+15 minutes while running, `/loop 15m Linear sync, CLAUDE.md section 7`):
+1. Your human's notifications (mentions), then issues updated since the last sync.
+2. The other lead's latest project update, and the `Facts` document if it changed.
+3. Tell your human, in at most three lines, only what changes their plan.
+
+**Per task**
 - **Before starting:** check In Progress issues and recent comments.
 - **Claim:** assign yourself, In Progress, comment the branch and files you'll touch. Never work on an issue
   or files someone else (or another agent) has In Progress.
+- **Contract change** (an API shape, schema, env var, shared type or port the other side uses): a `Contract`
+  issue before the PR merges, mentioning the other human. Their lead checks its in-flight branches against it.
 - **Done:** the squash merge closes it (check); comment the PR link + one line on how it was fixed.
 - **Blocked:** comment and mention the other human. Short, factual comments only.
+- Mention the other human only for: blocked on them, a contract change, a money or schema review, a failed deploy.
+  A mention becomes their notification, which their lead reads on its next sync.
+- **Right workspace:** each of us has other Linear workspaces connected. Before the first write in a session,
+  confirm the issue key is the Handover team's.
 
 ## 8. Tests and performance
 
