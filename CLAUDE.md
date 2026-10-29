@@ -136,6 +136,7 @@ workspaces connected, so before the first write in a session check that the issu
 | Run steps, ports, env var names (never values), live URL, deploy steps that worked, gotchas | `Facts` document in the project | Read it at session start. Whoever changes or learns a fact edits its line in place |
 | The deploy lock | Comments on `BHA-5` (Deploy lock) | Nobody deploys while its last comment is a `DEPLOYING` under 20 minutes old |
 | Each side's status | Project updates on `The Handover` | Each lead posts one after every merge or deploy, before its human goes offline, and at least every 2 hours |
+| Anything one human needs the other to run or know that has no issue of its own (setup steps, a command, a heads-up) | Comments on `CHAT` (BHA-54) | One running thread: post there instead of opening a new issue |
 
 Statuses: `Backlog` found, not ready · `Todo` ready to take · `In Progress` claimed · `Done` merged (the squash
 merge closes it; check) · `Canceled` or `Duplicate` dropped, with the reason or the duplicate linked.
@@ -186,8 +187,14 @@ human, and open a `Bug`; if the cause is on `main`, revert it there (section 6).
 Mention the other human only for: blocked on them, a contract change, a money or schema review, a failed deploy.
 A mention becomes their notification, which their lead reads on its next sync.
 
-**Sync** (a lead agent: at session start, before starting or merging a task, when a task agent finishes, and every
-15 minutes while running, `/loop 15m Linear sync, CLAUDE.md section 7`):
+**Listener:** a lead agent keeps the board listener running under Claude Code's Monitor tool:
+`python3 .claude/scripts/linear-watch.py` from the harness folder, with your human's personal Linear API key in
+`~/.config/handover/linear-api-key`. It prints one line for each comment, new issue, status or assignee change,
+project update or document edit the other side makes; every line triggers a sync. Re-arm the Monitor when it
+expires; the listener resumes from its last poll. Without it, sync every 15 minutes: `/loop 15m Linear sync, CLAUDE.md section 7`.
+
+**Sync** (a lead agent: at session start, before starting or merging a task, when a task agent finishes, and on
+every listener line):
 1. Your human's notifications (mentions), then issues updated since your previous sync (`list_issues` with
    `updatedAt`, such as `-PT20M`; at session start `-PT12H`).
 2. The other lead's latest project update, and the `Facts` document if it changed.
