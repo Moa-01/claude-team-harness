@@ -137,7 +137,7 @@ workspaces connected, so before the first write in a session check that the issu
 | The deploy lock | Comments on `BHA-5` (Deploy lock) | Nobody deploys while its last comment is a `DEPLOYING` under 20 minutes old |
 | Each side's status | Project updates on `The Handover` | Each lead posts one after every merge or deploy, before its human goes offline, and at least every 2 hours |
 | Anything one human needs the other to run or know that has no issue of its own (setup steps, a command, a heads-up) | Comments on the `CHAT` issue | One running thread: post there instead of opening a new issue |
-| Every finding's `REPORT.md` entry: a real bug, a false claim, an improvement, a feature | Comments on the `REPORT` issue, one per finding | Posted when the finding is settled, edited in place when its status changes (section 9) |
+| Every finding's `REPORT.md` entry: a real bug, a false claim, an improvement, a feature | Comments on the `REPORT` issue, one per finding | Posted once its PR is open, never at `Found`; edited in place when it changes (section 9) |
 
 Statuses: `Backlog` found, not ready · `Todo` ready to take · `In Progress` claimed · `Done` merged (the squash
 merge closes it; check) · `Canceled` or `Duplicate` dropped, with the reason or the duplicate linked.
@@ -182,7 +182,7 @@ the issue's `updatedAt`, so the sync sees it); with no issue to post on, open on
 | `CLUE` | whoever filed a `Clue` issue while on a task, on that task's issue; its lead relays it to its human | `Clue:` (the `Clue` issue) · `Why here:` |
 | `DEPLOYING` | the deployer, on `BHA-5` | `SHA:` |
 | `DEPLOYED` | the deployer, on `BHA-5`; it releases the lock, pass or fail | `SHA:` · `URL:` · `Smoke:` pass or fail |
-| `REPORT` | whoever settles a finding, on the `REPORT` issue; edited in place when it is fixed | the section 9 entry, unchanged |
+| `REPORT` | the task agent or lead, on the `REPORT` issue, once the finding's PR is open; edited in place when it changes | the PR's section 9 entry, unchanged |
 
 A failed smoke test: redeploy the last SHA whose smoke passed, if one has (same two comments), mention the other
 human, and open a `Bug`; if the cause is on `main`, revert it there (section 6). A project update is five lines: `Merged:` · `Deployed:` (SHA, smoke) · `In flight:` · `Next:` · `Blocked:`.
@@ -259,10 +259,13 @@ Performance or Deploy; bugs add a severity (critical, high, medium, low). Type n
 a page that tells the user something false is a UX bug (payout trends show a paid batch as "closed"), a page nobody
 promised is a UX improvement. The Type line labels the harm; the Cause line still carries the why.
 
-**The `REPORT` issue** holds every entry as it happens, one comment per finding, so both sides write one
-report: the entry above under a header line naming the ticket, `[agent yusuf/BHA-33] [REPORT]`. A finding gets its
-comment once it is settled (reproduced, or checked and found false); its fix edits that comment in place (Status,
-Fix, the PR link) instead of posting a second one. `REPORT.md` is assembled from these comments near the deadline.
+**The `REPORT` issue** holds every entry as it ships, one comment per finding, so both sides write one
+report: the PR's `REPORT.md` entry, unchanged, under a header line naming the ticket, `[agent yusuf/BHA-33] [REPORT]`.
+A finding gets its comment only once its PR is open, never at `Found`: a fix often shows the bug was something else
+than the ticket said. Before posting, check the `REPORT` issue and the ticket; a finding already there is never posted
+twice. The author edits its own comment when the entry changes (the merge, a review fix); a change to the other side's
+entry goes as a reply in that comment's thread, `[REPORT UPDATE]` with the changed fields, and the latest reply wins.
+`REPORT.md` is assembled from these comments near the deadline.
 
 ## 10. Priorities, recon and deploy
 
