@@ -17,7 +17,8 @@ Required by the rules: "Any AI tools are allowed. Declare your tools and setup a
   (it reads the team rules from `AGENTS.override.md`)
 - **Plugins/skills/hooks:** superpowers, playwright (both from Claude Code's plugin directory); no personal hooks,
   only this repo's `team-guard`
-- **MCP servers:** Linear, Playwright (through the plugin, headless)
+- **MCP servers:** Linear; Dilmune Cloud (its public MCP from the Dilmune docs, signed in with our team's account)
+  for deploys; Playwright (through the plugin, headless)
 - **Other:** a Claude Code profile and a Codex home made only for this event, so no personal config loads
 
 ## Shared setup (this repo)
