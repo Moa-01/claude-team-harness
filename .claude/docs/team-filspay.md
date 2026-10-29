@@ -242,6 +242,9 @@ Yusuf's side (payments, links, webhooks, money parsing, uploads, deploy):
 - BHA-37. The public link GET returns `api_keys.key_hash` (`paymentLinks/read.ts:43-44`). BUG, low.
 - BHA-38. A failed capture after authorize leaves a 7-day hold; amounts 0 or invalid answer 500 and can orphan an acquirer
   authorization. BUG, low.
+- Not filed yet: the payment-link page says "not found" for a link that exists once it is older than the newest 100,
+  because it searches the first list page (`apps/web/src/pages/payment-links/PaymentLinkDetailPage.tsx:20-31,46`; the
+  comment admits it). BUG, UX, low: the merchant cannot open or cancel that link. Fix: a merchant-scoped single-link read.
 - BHA-30. Deploy: migrations stop at 0054, compose wipes data, the committed secret, the 34-byte dev key (all above).
 
 Moataz's side (auth, admin, settlement, balances, fees, reporting):

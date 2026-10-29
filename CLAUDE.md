@@ -218,6 +218,7 @@ posts `CLAIM` → the task agent works and posts `PR READY` → the lead merges 
 ```markdown
 ### Bug: Transfers accept negative amounts
 - **Status:** Fixed
+- **Type:** Money, critical
 - **Problem:** Sending -10 BHD added money to the sender instead of rejecting it.
 - **Cause:** No check on the amount sign in `wallet/transfer.go`.
 - **Breaks:** Anyone could create money by sending a negative transfer.
@@ -229,12 +230,17 @@ posts `CLAIM` → the task agent works and posts `PR READY` → the lead merges 
 - **How to try:** History page → Export button.
 
 ### Improvement: The web app's root opens the dashboard
+- **Type:** UX
 - **Before:** The root URL showed a bare "404 Not Found" error page. Nothing promised a page there and nothing broke.
 - **Why it shipped:** The live root is the first page judges open; the admin app already redirects its root.
 - **Change:** One redirect from `/` to `/dashboard`, the same shape as the existing `/dashboard` redirect.
 ```
 
 An improvement never goes under `Bug:`, in `REPORT.md` or in Linear. When unsure, the bug test in section 3 decides.
+**Type** names the harm in one word, so judges can scan the report: Money, Security, Data, Concurrency, Time, UX,
+Performance or Deploy; bugs add a severity (critical, high, medium, low). Type never decides bug versus improvement:
+a page that tells the user something false is a UX bug (the payment-link page says "not found" for a link that
+exists), a page nobody promised is a UX improvement. The Type line labels the harm; the Cause line still carries the why.
 
 ## 10. Priorities, recon and deploy
 
