@@ -3,7 +3,7 @@
 Read before any FilsPay task. Every finding here was checked against the code on 29 Oct by three read-only reviews
 that tried to disprove it, then compared with an independent Codex audit. **(lead)** marks the ones the lead re-read
 or ran. Lines are from upstream `main` at `8b58b0f`; paths under `apps/api/src` drop that prefix. Story, clues and
-timing: `team-filspay-case.md`.
+timing: `team-filspay-case.md`. Every route with its auth and gate: `team-filspay-routes.md`.
 
 ## Where the code lives
 
@@ -30,14 +30,14 @@ timing: `team-filspay-case.md`.
   (competition rule 3; `HANDOVER.md:70` and ADR-0005 say they should not be in the chain).
 - **Tests need a database.** Most API tests and `scripts/reconcile_march.integration.test.ts` (run by root `npm test`)
   use `DATABASE_URL`. Point it at a local throwaway Postgres only.
-- **The web apps cannot reach the API in a browser as shipped.** The API registers no CORS (no `@fastify/cors`, a
+- **The web apps cannot reach the API in a browser as shipped (BHA-52).** The API registers no CORS (no `@fastify/cors`, a
   preflight answers 404) and `apps/web/src/api/client.ts:3` calls `http://localhost:3000` cross-origin with the cookie.
   Serve the API on the same origin: a Vite `server.proxy` for `/v1` locally (FH's comment at `apps/web/vite.config.ts:6`
   suggests it), the same path routing on the host. Adding `@fastify/cors` is a new dependency, so a human approves it.
 - **The merchant app has no `/` route** (`apps/web/src/router.tsx:22-99`), so its root shows React Router's bare
   "404 Not Found" error page. Open `/dashboard/login`; checkout lives at `/pay/:token`. The admin root redirects to
   `/merchants`, then `/login`. A missing root route and error page is an IMPROVEMENT, low.
-- **The seed prints the plaintext API keys it issues to stdout.** Keep seed output out of shared logs.
+- **The seed prints the plaintext API keys it issues to stdout (BHA-53).** Keep seed output out of shared logs.
   `db/seed/fixtures/production_seed.sql` ("staging prod mirror", 50k lines) is referenced by no script: never load it.
 - **Config traps:** `ops/.env.docker` is tracked in git with a real `ACQUIRER_CALLBACK_SIGNING_SECRET` (`.gitignore`
   only covers `.env`). The built-in dev `WEBHOOK_SECRET_ENCRYPTION_KEY` decodes to 34 bytes, so the API throws at boot
@@ -223,45 +223,45 @@ refunds (`CloseBatch` selects captures only); fix reconciliation, which subtract
 (`settlement/query.ts:288-333`); timeline, web `RefundDrawer.tsx` (posts to the wrong path), admin toggle. 0072's view
 joins `t.id = r.id` and is always empty (a new migration fixes it).
 
-## New bugs, not yet on a ticket
+## New bugs, filed 29 Oct
 
 Yusuf's side (payments, links, webhooks, money parsing, uploads, deploy):
-- Link payments skip the negotiated discount: only `routes/transactions.ts:111` calls `applyCaptureDiscountAdjustment`;
+- BHA-32. Link payments skip the negotiated discount: only `routes/transactions.ts:111` calls `applyCaptureDiscountAdjustment`;
   `pay.ts:115`'s "moved into capture.ts" is false. BUG, medium (lead). API and Go also round the discount differently,
   1 fil apart (BUG, low).
-- Capture idempotency ignores the transaction: `capture.ts:92` hashes only the amount, so a reused key replays another
+- BHA-33. Capture idempotency ignores the transaction: `capture.ts:92` hashes only the amount, so a reused key replays another
   transaction's capture. BUG, medium (lead).
-- Payout disbursement rows duplicate: the effect runs whenever `attempt_count` is 0 (`dispatcher.ts:160-163`, lead),
+- BHA-34. Payout disbursement rows duplicate: the effect runs whenever `attempt_count` is 0 (`dispatcher.ts:160-163`, lead),
   replays insert at attempt 0, one row per endpoint. BUG, high.
-- `lib/random.ts` uses `Math.random` for link tokens (`paymentLinks/create.ts:12`) and OTPs; `lib/crypto.ts` has the
+- BHA-35. `lib/random.ts` uses `Math.random` for link tokens (`paymentLinks/create.ts:12`) and OTPs; `lib/crypto.ts` has the
   right one. BUG, medium.
-- Webhooks: endpoint delete fails its FK (0022), any URL is allowed and test-send echoes 2 KB of the response (SSRF),
+- BHA-36. Webhooks: endpoint delete fails its FK (0022), any URL is allowed and test-send echoes 2 KB of the response (SSRF),
   callback `outcome` is never validated. BUG, medium, medium, low.
-- The public link GET returns `api_keys.key_hash` (`paymentLinks/read.ts:43-44`). BUG, low.
-- A failed capture after authorize leaves a 7-day hold; amounts 0 or invalid answer 500 and can orphan an acquirer
+- BHA-37. The public link GET returns `api_keys.key_hash` (`paymentLinks/read.ts:43-44`). BUG, low.
+- BHA-38. A failed capture after authorize leaves a 7-day hold; amounts 0 or invalid answer 500 and can orphan an acquirer
   authorization. BUG, low.
-- Deploy: migrations stop at 0054, compose wipes data, the committed secret, the 34-byte dev key (all above).
+- BHA-30. Deploy: migrations stop at 0054, compose wipes data, the committed secret, the 34-byte dev key (all above).
 
 Moataz's side (auth, admin, settlement, balances, fees, reporting):
-- Login can land in another merchant: `routes/auth.ts:78` takes the OTP recipient from `findOtpRecipient`, which matches
+- BHA-39. Login can land in another merchant: `routes/auth.ts:78` takes the OTP recipient from `findOtpRecipient`, which matches
   the email across all merchants with `LIMIT 1` (`auth/users.ts:19-20`); the seed has one email in two merchants. BUG,
   critical (lead).
 - Login without the OTP (BHA-11) is reproduced on a live local run: after the password step, `/v1/auth/me` and
   `/v1/transactions` answer 200 with the merchant's data; the admin flow answers 401 until verify.
-- Impersonation writes: super_admin maps to owner (`impersonation.ts:85-89`) and any grant can capture and void
+- BHA-40. Impersonation writes: super_admin maps to owner (`impersonation.ts:85-89`) and any grant can capture and void
   (`routes/transactions.ts:95,123`), logged as the merchant. BUG, high.
-- Bulk KYC approves rejected merchants (`admin/bulkKyc.ts:27-30`, no status predicate). BUG, high.
-- Split-child reports: `reporting/scope.ts:12-19` lets any merchant read any split child's transactions. BUG, high (lead).
-- `NetPayableFils` in float32 (`payable.go:11`) feeds `net_payout_fils`: 13 of 80 exported batches are off 1 to 2 fils.
+- BHA-41. Bulk KYC approves rejected merchants (`admin/bulkKyc.ts:27-30`, no status predicate). BUG, high.
+- BHA-42. Split-child reports: `reporting/scope.ts:12-19` lets any merchant read any split child's transactions. BUG, high (lead).
+- BHA-43. `NetPayableFils` in float32 (`payable.go:11`) feeds `net_payout_fils`: 13 of 80 exported batches are off 1 to 2 fils.
   BUG, high.
-- Suspended merchants keep money access through existing sessions and keys. BUG, medium.
-- Reporting: outbox ids committed out of order are skipped (`runConsumerPass.ts:49`), catch-up and the worker both apply
+- BHA-44. Suspended merchants keep money access through existing sessions and keys. BUG, medium.
+- BHA-45. Reporting: outbox ids committed out of order are skipped (`runConsumerPass.ts:49`), catch-up and the worker both apply
   the same events (`catchUp.ts:21`), a missing rollup row stalls the consumer (`applyEvent.ts:147-148`), trends never
   show "paid". BUG, medium, medium, latent high, low.
-- Reconciliation subtracts payouts twice (Codex, not re-read). `rebuild-balances --merchant` writes nothing
+- BHA-46. Reconciliation subtracts payouts twice (Codex, not re-read). `rebuild-balances --merchant` writes nothing
   (`main.go:154`). `/export-summary` has no auth hook and always 500s. BUG, medium, low, low.
-- Credit approval compares display names (`creditApproval.ts:11`); no rename route exists. LATENT, medium.
-- `platform_stats` adds int32 (`platform_volume.go:26`, INTEGER column); wraps past 2,147,483,647 fils. LATENT, medium.
+- BHA-47. Credit approval compares display names (`creditApproval.ts:11`); no rename route exists. LATENT, medium.
+- BHA-48. `platform_stats` adds int32 (`platform_volume.go:26`, INTEGER column); wraps past 2,147,483,647 fils. LATENT, medium.
 - Codex only, not re-read: the discount adjustment dedupes by counts, not capture ids (`discountAdjustment.ts:52-77`,
   plausible BUG, low); the admin analytics rebuild races the consumer and reads a different source than the CLI
   rebuild (`admin/reportingRebuild.ts:11`, BUG, medium); Go and TS pick different fee schedules on the same
