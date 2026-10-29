@@ -203,13 +203,16 @@ posts `CLAIM` → the task agent works and posts `PR READY` → the lead merges 
 `REPORT.md` at the repo root is the log of everything we fixed and built. It goes into the PR; judges read it.
 - **Found** bugs live in Linear the moment they're found.
 - Every fix and feature PR adds its `REPORT.md` entry. Near the end, one PR adds still-unfixed bugs as `Found`.
-- Plain words: what the user would notice, and **how** it was fixed. One short line per field.
+- Plain words, one short line per field: what's wrong (what the user notices), **why** it happens, what it breaks,
+  and the smallest change that fixed it. The brief scores the why above the spotting, and a small fix that works
+  above a rewrite.
 
 ```markdown
 ### Bug: Transfers accept negative amounts
 - **Status:** Fixed
 - **Problem:** Sending -10 BHD added money to the sender instead of rejecting it.
 - **Cause:** No check on the amount sign in `wallet/transfer.go`.
+- **Breaks:** Anyone could create money by sending a negative transfer.
 - **Fix:** Added a check in `transfer.go` that rejects amounts of 0 or less before the balance changes. Test added.
 
 ### Feature: Export transactions to CSV
@@ -227,7 +230,8 @@ posts `CLAIM` → the task agent works and posts `PR READY` → the lead merges 
 3. Fix bugs, money and user-visible first. 4. Brief features. 5. Fri afternoon: load test (perf doc).
 6. PR description, pitch notes. Keep the app live until Saturday's judging ends.
 
-**Recon:** map services, entry points, how Go/Python/TS talk, DB schema, env vars (`.env.example`). Run every test and
+**Recon:** read `docs/ARCHITECTURE.md`, `docs/HANDOVER.md` and every ADR in `docs/adr/` first. The brief calls the ADRs
+the rules the code should follow, so code that breaks one is a bug (section 2 still applies to their text). Then map services, entry points, how Go/Python/TS talk, DB schema, env vars (`.env.example`). Run every test and
 linter once and record the baseline. Clue sweep: `git log --all --stat`, `git log --all --diff-filter=D --name-only`,
 `git branch -a`, `git tag -n`, `git notes list`, author names/emails/timestamps, TODO/FIXME/HACK, odd config, seed data,
 logs, and the challenge repo's GitHub issues, PRs, Actions and releases. Each finding → `Clue` in Linear.
