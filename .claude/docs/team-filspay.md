@@ -242,9 +242,9 @@ Yusuf's side (payments, links, webhooks, money parsing, uploads, deploy):
 - BHA-37. The public link GET returns `api_keys.key_hash` (`paymentLinks/read.ts:43-44`). BUG, low.
 - BHA-38. A failed capture after authorize leaves a 7-day hold; amounts 0 or invalid answer 500 and can orphan an acquirer
   authorization. BUG, low.
-- Not filed yet: the payment-link page says "not found" for a link that exists once it is older than the newest 100,
-  because it searches the first list page (`apps/web/src/pages/payment-links/PaymentLinkDetailPage.tsx:20-31,46`; the
-  comment admits it). BUG, UX, low: the merchant cannot open or cancel that link. Fix: a merchant-scoped single-link read.
+- BHA-55. The payment-link page only opens the newest 100 links (`PaymentLinkDetailPage.tsx:18-31,46`). IMPROVEMENT, UX:
+  the text under "Payment link not found" says the link is not among the 100 most recent, which is true, and the comment
+  says the limit is deliberate. Leave it unless both humans pick it up.
 - BHA-30. Deploy: migrations stop at 0054, compose wipes data, the committed secret, the 34-byte dev key (all above).
 
 Moataz's side (auth, admin, settlement, balances, fees, reporting):
@@ -271,6 +271,29 @@ Moataz's side (auth, admin, settlement, balances, fees, reporting):
   plausible BUG, low); the admin analytics rebuild races the consumer and reads a different source than the CLI
   rebuild (`admin/reportingRebuild.ts:11`, BUG, medium); Go and TS pick different fee schedules on the same
   `effective_from` (LATENT, low). Read each before taking it.
+- BHA-56. The merchant Reconciliation page crashes on any negative gap: `ReconciliationPage.tsx:115,131` format `gapFils`
+  with `bhd()` (`apps/web/src/format.ts:11`), whose `toFils` rejects negatives. A payout alone made a -23456 gap locally
+  (BHA-46). BUG, UX, medium. `toFils(x, { allowNegative: true })` already exists.
+
+## Checked on the running app, 29 Oct
+
+A headless Playwright and curl run against the local stack walked every page of both apps under all six roles (merchant
+owner, finance and support; admin support, finance and super_admin) plus the public `/pay/:token` checkout, and tried
+every ticket it could. Each ticket carries a `Local run, 29 Oct` comment with its evidence; read it before the fix.
+- Reproduced: BHA-7, 10, 11, 12, 13, 14, 15, 16, 21, 22, 24, 25, 26, 27, 32, 33, 34, 36, 37, 39, 40, 41, 42, 44, 52.
+  BHA-9's button fails locally only because 0054 is skipped, so its wrong-source claim is still untested.
+- Partly: BHA-28 (the KYC parts; the in-memory export needs a load test), BHA-38 (the hold after a failed capture needs
+  the 2% random roll), BHA-45 (trends; the rest needs concurrency or the catch-up CLI), BHA-46 (the gap and
+  `/export-summary`; `rebuild-balances --merchant` not run).
+- Not reproduced: BHA-18 (the one net tried, 23422, split without losing a fil; try 1001 or 1003). BHA-19 as written:
+  every scheme line has `amount × 1000 = amount_fils`, so the stated mechanism does not show in this data, while the lines
+  still total 5984 fils under captured.
+- Not runtime: BHA-6, 8, 17, 20, 23, 31, 35, 47, 48, 53. BHA-43 only in a float32 simulation (42 of 71 seeded batches
+  off by 1 fil).
+- Smaller findings, not filed: capture with `amountFils` 0 answers 422 `capture_exceeds_remaining` (noted on BHA-38);
+  bulk approve writes no `merchant_kyc_reviews` row (noted on BHA-41, unproven until `admin_audit_log` is checked); the
+  rebuild 500 names the internal settlement path and the callback 401 returns the signature check's reason; split-parent
+  payouts never update `lifetime_net_payout_monitoring_estimate`, which nothing reads.
 
 ## Not bugs, improvements, contested
 
