@@ -36,7 +36,9 @@ timing: `team-filspay-case.md`. Every route with its auth and gate: `team-filspa
   suggests it), the same path routing on the host. Adding `@fastify/cors` is a new dependency, so a human approves it.
 - **The merchant app has no `/` route** (`apps/web/src/router.tsx:22-99`), so its root shows React Router's bare
   "404 Not Found" error page. Open `/dashboard/login`; checkout lives at `/pay/:token`. The admin root redirects to
-  `/merchants`, then `/login`. A missing root route and error page is an IMPROVEMENT, low.
+  `/merchants`, then `/login`. This is an IMPROVEMENT, not a bug: nothing promised a root page and nothing breaks.
+  It ships with the deploy (BHA-30) as the `Improvement:` entry in CLAUDE.md section 9, because judges open the root
+  first. It is the team's worked example of the line between the two.
 - **The seed prints the plaintext API keys it issues to stdout (BHA-53).** Keep seed output out of shared logs.
   `db/seed/fixtures/production_seed.sql` ("staging prod mirror", 50k lines) is referenced by no script: never load it.
 - **Config traps:** `ops/.env.docker` is tracked in git with a real `ACQUIRER_CALLBACK_SIGNING_SECRET` (`.gitignore`
