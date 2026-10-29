@@ -30,6 +30,15 @@ timing: `team-filspay-case.md`.
   (competition rule 3; `HANDOVER.md:70` and ADR-0005 say they should not be in the chain).
 - **Tests need a database.** Most API tests and `scripts/reconcile_march.integration.test.ts` (run by root `npm test`)
   use `DATABASE_URL`. Point it at a local throwaway Postgres only.
+- **The web apps cannot reach the API in a browser as shipped.** The API registers no CORS (no `@fastify/cors`, a
+  preflight answers 404) and `apps/web/src/api/client.ts:3` calls `http://localhost:3000` cross-origin with the cookie.
+  Serve the API on the same origin: a Vite `server.proxy` for `/v1` locally (FH's comment at `apps/web/vite.config.ts:6`
+  suggests it), the same path routing on the host. Adding `@fastify/cors` is a new dependency, so a human approves it.
+- **The merchant app has no `/` route** (`apps/web/src/router.tsx:22-99`), so its root shows React Router's bare
+  "404 Not Found" error page. Open `/dashboard/login`; checkout lives at `/pay/:token`. The admin root redirects to
+  `/merchants`, then `/login`. A missing root route and error page is an IMPROVEMENT, low.
+- **The seed prints the plaintext API keys it issues to stdout.** Keep seed output out of shared logs.
+  `db/seed/fixtures/production_seed.sql` ("staging prod mirror", 50k lines) is referenced by no script: never load it.
 - **Config traps:** `ops/.env.docker` is tracked in git with a real `ACQUIRER_CALLBACK_SIGNING_SECRET` (`.gitignore`
   only covers `.env`). The built-in dev `WEBHOOK_SECRET_ENCRYPTION_KEY` decodes to 34 bytes, so the API throws at boot
   unless you pass a real 32-byte key. With `NODE_ENV` unset, `OTP_DEV_EXPOSE` turns on (`config.ts:127,212`) and the
@@ -237,6 +246,8 @@ Moataz's side (auth, admin, settlement, balances, fees, reporting):
 - Login can land in another merchant: `routes/auth.ts:78` takes the OTP recipient from `findOtpRecipient`, which matches
   the email across all merchants with `LIMIT 1` (`auth/users.ts:19-20`); the seed has one email in two merchants. BUG,
   critical (lead).
+- Login without the OTP (BHA-11) is reproduced on a live local run: after the password step, `/v1/auth/me` and
+  `/v1/transactions` answer 200 with the merchant's data; the admin flow answers 401 until verify.
 - Impersonation writes: super_admin maps to owner (`impersonation.ts:85-89`) and any grant can capture and void
   (`routes/transactions.ts:95,123`), logged as the merchant. BUG, high.
 - Bulk KYC approves rejected merchants (`admin/bulkKyc.ts:27-30`, no status predicate). BUG, high.
@@ -251,6 +262,10 @@ Moataz's side (auth, admin, settlement, balances, fees, reporting):
   (`main.go:154`). `/export-summary` has no auth hook and always 500s. BUG, medium, low, low.
 - Credit approval compares display names (`creditApproval.ts:11`); no rename route exists. LATENT, medium.
 - `platform_stats` adds int32 (`platform_volume.go:26`, INTEGER column); wraps past 2,147,483,647 fils. LATENT, medium.
+- Codex only, not re-read: the discount adjustment dedupes by counts, not capture ids (`discountAdjustment.ts:52-77`,
+  plausible BUG, low); the admin analytics rebuild races the consumer and reads a different source than the CLI
+  rebuild (`admin/reportingRebuild.ts:11`, BUG, medium); Go and TS pick different fee schedules on the same
+  `effective_from` (LATENT, low). Read each before taking it.
 
 ## Not bugs, improvements, contested
 
