@@ -227,7 +227,14 @@ posts `CLAIM` → the task agent works and posts `PR READY` → the lead merges 
 - **What:** Users can download their transaction history as a CSV file.
 - **How it works:** New `GET /api/transactions/export` endpoint builds the CSV; the History page's Export button calls it.
 - **How to try:** History page → Export button.
+
+### Improvement: The web app's root opens the dashboard
+- **Before:** The root URL showed a bare "404 Not Found" error page. Nothing promised a page there and nothing broke.
+- **Why it shipped:** The live root is the first page judges open; the admin app already redirects its root.
+- **Change:** One redirect from `/` to `/dashboard`, the same shape as the existing `/dashboard` redirect.
 ```
+
+An improvement never goes under `Bug:`, in `REPORT.md` or in Linear. When unsure, the bug test in section 3 decides.
 
 ## 10. Priorities, recon and deploy
 
