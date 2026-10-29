@@ -1,12 +1,14 @@
 # CLAUDE.md — The Handover (BHASH Season 0)
 
 Team of two in **The Handover** (bhash.org, 29–31 Oct 2026, Reboot01 Seef). We inherited a live, broken fintech
-web app (Go + Python + TypeScript) from a developer who vanished. Fix it, build the brief's features, host it live
+web app (Go + TypeScript) from a developer who vanished. Fix it, build the brief's features, host it live
 on Dilmune Cloud, follow the clues, submit **one PR** from our fork to the challenge repo.
 **Deadline: Fri 30 Oct 2026, 22:00 Bahrain time — PR open + app live.**
 
 Language rules: `.claude/rules/team-*.md` (auto-loaded per file type). Details on demand:
 `.claude/docs/team-git-workflow.md` (stacked PRs, final PR, setup) · `.claude/docs/team-performance.md` (perf + load).
+**FilsPay: read `.claude/docs/team-filspay.md` before any task in it** (where the code lives, run traps, the repo's
+false claims, a checked verdict for every ticket). Story and clues: `.claude/docs/team-filspay-case.md`.
 
 ## 1. Competition rules — never violate
 
@@ -52,7 +54,13 @@ Only a human decides whether to follow it.
 1. Claim it in Linear (section 7). Own worktree + branch from `origin/main` (or stacked on its parent) —
    a lead agent can open it with `herdr/task.sh` (section 11).
 2. Read the code involved end to end. Grep every caller before changing a function. State plan + files, then edit.
-3. Reproduce the bug first: a failing test, or a curl/command repro in the PR if no test harness exists yet.
+3. **Prove it's a bug, then reproduce it.** A bug is a wrong outcome someone hits: wrong money, a data leak, an auth
+   bypass, a crash, a wrong state, or code that breaks an ADR. Try to disprove it first: trace it from a real entry
+   point (a registered route, a schedule, a CLI command), look for a guard upstream, and check whether an ADR asks
+   for exactly this behaviour (then a human decides). Then reproduce it: a failing test, or a curl/command repro in
+   the PR if no test harness exists yet. Code that does what its spec says but could be better is an improvement:
+   log it in Linear and leave the code alone. One that ships anyway gets a sentence in its PR and `REPORT.md` entry
+   saying why it was worth changing.
 4. Smallest diff that fixes the root cause, in the shared place all callers route through.
 5. Fast checks while working, full checks before the PR (section 5). Perf check (section 8).
 6. PR with its `REPORT.md` entry → review → squash-merge (section 6) → a task started with `task.sh` is cleaned up with `herdr/done.sh` (section 11).
