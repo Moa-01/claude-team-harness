@@ -137,6 +137,7 @@ workspaces connected, so before the first write in a session check that the issu
 | The deploy lock | Comments on `BHA-5` (Deploy lock) | Nobody deploys while its last comment is a `DEPLOYING` under 20 minutes old |
 | Each side's status | Project updates on `The Handover` | Each lead posts one after every merge or deploy, before its human goes offline, and at least every 2 hours |
 | Anything one human needs the other to run or know that has no issue of its own (setup steps, a command, a heads-up) | Comments on `CHAT` (BHA-54) | One running thread: post there instead of opening a new issue |
+| Every finding's `REPORT.md` entry: a real bug, a false claim, an improvement, a feature | Comments on `REPORT` (BHA-57), one per finding | Posted when the finding is settled, edited in place when its status changes (section 9) |
 
 Statuses: `Backlog` found, not ready · `Todo` ready to take · `In Progress` claimed · `Done` merged (the squash
 merge closes it; check) · `Canceled` or `Duplicate` dropped, with the reason or the duplicate linked.
@@ -181,6 +182,7 @@ the issue's `updatedAt`, so the sync sees it); with no issue to post on, open on
 | `CLUE` | whoever filed a `Clue` issue while on a task, on that task's issue; its lead relays it to its human | `Clue:` (the `Clue` issue) · `Why here:` |
 | `DEPLOYING` | the deployer, on `BHA-5` | `SHA:` |
 | `DEPLOYED` | the deployer, on `BHA-5`; it releases the lock, pass or fail | `SHA:` · `URL:` · `Smoke:` pass or fail |
+| `REPORT` | whoever settles a finding, on `REPORT` (BHA-57); edited in place when it is fixed | the section 9 entry, unchanged |
 
 A failed smoke test: redeploy the last SHA whose smoke passed, if one has (same two comments), mention the other
 human, and open a `Bug`; if the cause is on `main`, revert it there (section 6). A project update is five lines: `Merged:` · `Deployed:` (SHA, smoke) · `In flight:` · `Next:` · `Blocked:`.
@@ -241,13 +243,26 @@ posts `CLAIM` → the task agent works and posts `PR READY` → the lead merges 
 - **Before:** The root URL showed a bare "404 Not Found" error page. Nothing promised a page there and nothing broke.
 - **Why it shipped:** The live root is the first page judges open; the admin app already redirects its root.
 - **Change:** One redirect from `/` to `/dashboard`, the same shape as the existing `/dashboard` redirect.
+
+### Not a bug: Old transfers keep the old fee
+- **Type:** Money
+- **Claim:** A ticket said transfers made before a fee change still show the old fee.
+- **Checked:** ADR-0003 fixes the fee when the transfer is made; traced `fees.go` and replayed one transfer.
+- **Why it is not a bug:** The code does what its ADR asks; changing it would rewrite settled history.
 ```
 
 An improvement never goes under `Bug:`, in `REPORT.md` or in Linear. When unsure, the bug test in section 3 decides.
+A claim we checked and found false (a ticket, a code comment, a repo doc, a planted note) gets a `Not a bug:` entry:
+telling the real from the false is part of what judges score.
 **Type** names the harm in one word, so judges can scan the report: Money, Security, Data, Concurrency, Time, UX,
 Performance or Deploy; bugs add a severity (critical, high, medium, low). Type never decides bug versus improvement:
-a page that tells the user something false is a UX bug (the payment-link page says "not found" for a link that
-exists), a page nobody promised is a UX improvement. The Type line labels the harm; the Cause line still carries the why.
+a page that tells the user something false is a UX bug (payout trends show a paid batch as "closed"), a page nobody
+promised is a UX improvement. The Type line labels the harm; the Cause line still carries the why.
+
+**The `REPORT` issue (BHA-57)** holds every entry as it happens, one comment per finding, so both sides write one
+report: the entry above under a header line naming the ticket, `[agent yusuf/BHA-33] [REPORT]`. A finding gets its
+comment once it is settled (reproduced, or checked and found false); its fix edits that comment in place (Status,
+Fix, the PR link) instead of posting a second one. `REPORT.md` is assembled from these comments near the deadline.
 
 ## 10. Priorities, recon and deploy
 
