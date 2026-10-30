@@ -5,12 +5,15 @@ Required by the rules: "Any AI tools are allowed. Declare your tools and setup a
 
 **Harness repo (public):** https://github.com/Moa-01/claude-team-harness
 
+**Team:** OutVibe (Yusuf Mohamed and Moataz)
+**Submission fork (public):** https://github.com/SilentYsf/OutVibe-fils-pay
+**Live app:** https://outvibe.167-71-36-0.sslip.io
+
 ## Member 1 — Moataz
 - **Agent:** Claude Code (CLI), model Claude Opus 5.5
 - **Plugins/skills:** superpowers, caveman, ponytail, claude-mem (local memory across sessions), watch
 - **Hooks:** RTK (rewrites shell commands through `rtk` to shorten their output)
 - **MCP servers:** Linear, claude-in-chrome
-- **Other:** <editor, extensions>
 
 ## Member 2 — Yusuf Mohamed
 - **Agent:** Claude Code (CLI), model Claude Opus 5.5; Codex CLI, model gpt-6.1-sol, for some task agents
